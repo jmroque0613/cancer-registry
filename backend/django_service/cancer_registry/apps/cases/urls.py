@@ -1,7 +1,7 @@
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from .views import CancerCaseViewSet
 
 router = DefaultRouter()
-# TODO: register viewsets
+router.register(r"", CancerCaseViewSet, basename="case")
 
 urlpatterns = router.urls

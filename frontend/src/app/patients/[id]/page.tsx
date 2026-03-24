@@ -26,14 +26,17 @@ export default function PatientDetailPage() {
   const { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cases, setCases] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8002/api/v1/registry/patients/${id}/`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPatient(data);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`http://localhost:8002/api/v1/registry/patients/${id}/`).then((r) => r.json()),
+      fetch(`http://localhost:8002/api/v1/registry/cases/?patient=${id}`).then((r) => r.json()),
+    ]).then(([patientData, casesData]) => {
+      setPatient(patientData);
+      setCases(Array.isArray(casesData) ? casesData : casesData.results ?? []);
+      setLoading(false);
+    });
   }, [id]);
 
   if (loading) return <main style={{ padding: "40px" }}>Loading...</main>;
@@ -90,20 +93,68 @@ export default function PatientDetailPage() {
         <h2 style={{ fontSize: "14px", fontWeight: 600, color: "#636e72", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
           Cancer Cases
         </h2>
-        <p style={{ color: "#b2bec3", fontSize: "14px" }}>No cases recorded yet.</p>
-        <button style={{
-          marginTop: "12px",
-          padding: "9px 18px",
-          background: "#0984e3",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          fontSize: "13px",
-          cursor: "pointer",
-          fontWeight: 500,
-        }}>
+        {cases.length === 0 ? (
+          <p style={{ color: "#b2bec3", fontSize: "14px" }}>No cases recorded yet.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #f1f2f6" }}>
+                <th style={th}>Primary Site</th>
+                <th style={th}>Histology</th>
+                <th style={th}>Stage</th>
+                <th style={th}>Diagnosis Date</th>
+                <th style={th}>Status</th>
+                <th style={th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cases.map((c) => (
+                <tr key={c.id} style={{ borderBottom: "1px solid #f1f2f6" }}>
+                  <td style={td}>{c.primary_site}</td>
+                  <td style={td}>{c.histology}</td>
+                  <td style={td}>{c.stage || "—"}</td>
+                  <td style={td}>{c.diagnosis_date}</td>
+                  <td style={td}>
+                    <span style={{
+                      padding: "3px 10px",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                      background: c.status === "active" ? "#00b894" : c.status === "remission" ? "#0984e3" : "#b2bec3",
+                      color: "white",
+                    }}>
+                      {c.status.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td style={td}>
+                    <Link
+                      href={`/cases/${c.id}`}
+                      style={{ color: "#0984e3", textDecoration: "none", fontSize: "13px", fontWeight: 500 }}
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <Link
+          href={`/cases/new?patient=${patient.id}`}
+          style={{
+            display: "inline-block",
+            marginTop: "12px",
+            padding: "9px 18px",
+            background: "#0984e3",
+            color: "white",
+            borderRadius: "8px",
+            fontSize: "13px",
+            textDecoration: "none",
+            fontWeight: 500,
+          }}
+        >
           + Add Cancer Case
-        </button>
+        </Link>
       </div>
     </main>
   );
@@ -117,3 +168,6 @@ function Field({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+const th: React.CSSProperties = { padding: "10px 12px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "#636e72" };
+const td: React.CSSProperties = { padding: "10px 12px", fontSize: "13px" };
