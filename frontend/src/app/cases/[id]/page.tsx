@@ -52,14 +52,17 @@ export default function CaseDetailPage() {
   const { id } = useParams();
   const [ccase, setCcase] = useState<CancerCase | null>(null);
   const [loading, setLoading] = useState(true);
+  const [treatments, setTreatments] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8002/api/v1/registry/cases/${id}/`)
-      .then((r) => r.json())
-      .then((data) => {
-        setCcase(data);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch(`http://localhost:8002/api/v1/registry/cases/${id}/`).then((r) => r.json()),
+      fetch(`http://localhost:8002/api/v1/registry/treatments/?case=${id}`).then((r) => r.json()),
+    ]).then(([caseData, treatmentData]) => {
+      setCcase(caseData);
+      setTreatments(Array.isArray(treatmentData) ? treatmentData : treatmentData.results ?? []);
+      setLoading(false);
+    });
   }, [id]);
 
   if (loading) return <main style={{ padding: "40px" }}>Loading...</main>;
@@ -126,12 +129,48 @@ export default function CaseDetailPage() {
 
       <div style={{ background: "white", borderRadius: "12px", padding: "24px" }}>
         <h2 style={sectionTitle}>Treatments</h2>
-        <p style={{ color: "#b2bec3", fontSize: "14px" }}>No treatments recorded yet.</p>
+        {treatments.length === 0 ? (
+          <p style={{ color: "#b2bec3", fontSize: "14px" }}>No treatments recorded yet.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "12px" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #f1f2f6" }}>
+                <th style={th}>Type</th>
+                <th style={th}>Name / Protocol</th>
+                <th style={th}>Start Date</th>
+                <th style={th}>End Date</th>
+                <th style={th}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {treatments.map((t) => (
+                <tr key={t.id} style={{ borderBottom: "1px solid #f1f2f6" }}>
+                  <td style={td}>{t.treatment_type_display}</td>
+                  <td style={td}>{t.name}</td>
+                  <td style={td}>{t.start_date}</td>
+                  <td style={td}>{t.end_date || "—"}</td>
+                  <td style={td}>
+                    <span style={{
+                      padding: "3px 10px",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                      background: t.status === "completed" ? "#00b894" : t.status === "ongoing" ? "#0984e3" : t.status === "discontinued" ? "#d63031" : "#fdcb6e",
+                      color: "white",
+                    }}>
+                      {t.status_display}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <Link
           href={`/treatments/new?case=${ccase.id}`}
           style={{
             display: "inline-block",
-            marginTop: "12px",
+            marginTop: "4px",
             padding: "9px 18px",
             background: "#0984e3",
             color: "white",
@@ -165,3 +204,6 @@ const sectionTitle: React.CSSProperties = {
   letterSpacing: "0.5px",
   marginBottom: "16px",
 };
+
+const th: React.CSSProperties = { padding: "10px 12px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "#636e72" };
+const td: React.CSSProperties = { padding: "10px 12px", fontSize: "13px" };

@@ -11,16 +11,22 @@
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "esModuleInterop": true
   },
   "include": [
     "next-env.d.ts",
