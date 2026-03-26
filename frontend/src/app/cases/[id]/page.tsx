@@ -53,14 +53,17 @@ export default function CaseDetailPage() {
   const [ccase, setCcase] = useState<CancerCase | null>(null);
   const [loading, setLoading] = useState(true);
   const [treatments, setTreatments] = useState<any[]>([]);
+  const [followups, setFollowups] = useState<any[]>([]);
 
   useEffect(() => {
     Promise.all([
       fetch(`http://localhost:8002/api/v1/registry/cases/${id}/`).then((r) => r.json()),
       fetch(`http://localhost:8002/api/v1/registry/treatments/?case=${id}`).then((r) => r.json()),
-    ]).then(([caseData, treatmentData]) => {
+      fetch(`http://localhost:8002/api/v1/registry/followups/?case=${id}`).then((r) => r.json()),
+    ]).then(([caseData, treatmentData, followupData]) => {
       setCcase(caseData);
       setTreatments(Array.isArray(treatmentData) ? treatmentData : treatmentData.results ?? []);
+      setFollowups(Array.isArray(followupData) ? followupData : followupData.results ?? []);
       setLoading(false);
     });
   }, [id]);
@@ -127,7 +130,7 @@ export default function CaseDetailPage() {
         </div>
       )}
 
-      <div style={{ background: "white", borderRadius: "12px", padding: "24px" }}>
+      <div style={{ background: "white", borderRadius: "12px", padding: "24px", marginBottom: "20px" }}>
         <h2 style={sectionTitle}>Treatments</h2>
         {treatments.length === 0 ? (
           <p style={{ color: "#b2bec3", fontSize: "14px" }}>No treatments recorded yet.</p>
@@ -181,6 +184,63 @@ export default function CaseDetailPage() {
           }}
         >
           + Add Treatment
+        </Link>
+      </div>
+
+      <div style={{ background: "white", borderRadius: "12px", padding: "24px" }}>
+        <h2 style={sectionTitle}>Follow-ups</h2>
+        {followups.length === 0 ? (
+          <p style={{ color: "#b2bec3", fontSize: "14px" }}>No follow-ups recorded yet.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "12px" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #f1f2f6" }}>
+                <th style={th}>Date</th>
+                <th style={th}>Patient Status</th>
+                <th style={th}>Contact Method</th>
+                <th style={th}>Next Follow-up</th>
+                <th style={th}>Physician</th>
+              </tr>
+            </thead>
+            <tbody>
+              {followups.map((f) => (
+                <tr key={f.id} style={{ borderBottom: "1px solid #f1f2f6" }}>
+                  <td style={td}>{f.followup_date}</td>
+                  <td style={td}>
+                    <span style={{
+                      padding: "3px 10px",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                      background: f.patient_status.startsWith("alive_no") ? "#00b894" : f.patient_status.startsWith("alive_with") ? "#fdcb6e" : f.patient_status.startsWith("deceased") ? "#636e72" : "#b2bec3",
+                      color: "white",
+                    }}>
+                      {f.patient_status_display}
+                    </span>
+                  </td>
+                  <td style={td}>{f.contact_method_display}</td>
+                  <td style={td}>{f.next_followup_date || "—"}</td>
+                  <td style={td}>{f.attending_physician || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <Link
+          href={`/followups/new?case=${ccase.id}`}
+          style={{
+            display: "inline-block",
+            marginTop: "4px",
+            padding: "9px 18px",
+            background: "#00b894",
+            color: "white",
+            borderRadius: "8px",
+            fontSize: "13px",
+            textDecoration: "none",
+            fontWeight: 500,
+          }}
+        >
+          + Add Follow-up
         </Link>
       </div>
     </main>

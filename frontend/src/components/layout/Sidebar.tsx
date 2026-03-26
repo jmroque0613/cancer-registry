@@ -8,6 +8,7 @@ const navItems = [
   { href: "/patients", label: "Patients", icon: "♟" },
   { href: "/cases", label: "Cancer Cases", icon: "⊕" },
   { href: "/treatments", label: "Treatments", icon: "✚" },
+  { href: "/followups", label: "Follow-ups", icon: "↻" },
   { href: "/reports", label: "Reports", icon: "▤" },
 ];
 
