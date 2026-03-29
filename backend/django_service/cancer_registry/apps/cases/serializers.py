@@ -24,7 +24,8 @@ class CancerCaseSerializer(serializers.ModelSerializer):
 class CancerCaseListSerializer(serializers.ModelSerializer):
     patient_name = serializers.CharField(source="patient.full_name", read_only=True)
     patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+    sex = serializers.CharField(source="patient.sex", read_only=True)
 
     class Meta:
         model = CancerCase
-        fields = ["id", "patient", "patient_name", "patient_mrn", "primary_site", "histology", "stage", "diagnosis_date", "status"]
+        fields = ["id", "patient", "patient_name", "patient_mrn", "sex", "primary_site", "histology", "stage", "diagnosis_date", "status"]

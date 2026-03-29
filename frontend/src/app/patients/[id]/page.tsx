@@ -50,6 +50,13 @@ export default function PatientDetailPage() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "8px 0 24px" }}>
         <h1 style={{ fontSize: "24px" }}>{patient.full_name}</h1>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Link
+            href={`/patients/${id}/edit`}
+            style={{ padding: "7px 16px", background: "#f1f2f6", color: "#2d3436", borderRadius: "8px", textDecoration: "none", fontSize: "13px", fontWeight: 500 }}
+          >
+            Edit
+          </Link>
         <span style={{
           padding: "4px 12px",
           background: patient.is_active ? "#00b894" : "#b2bec3",
@@ -60,7 +67,8 @@ export default function PatientDetailPage() {
         }}>
           {patient.is_active ? "Active" : "Inactive"}
         </span>
-      </div>
+        </div>
+      </div>  
 
       <div style={{ background: "white", borderRadius: "12px", padding: "24px", marginBottom: "20px" }}>
         <h2 style={{ fontSize: "14px", fontWeight: 600, color: "#636e72", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "0.5px" }}>

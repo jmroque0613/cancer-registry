@@ -87,17 +87,25 @@ export default function CaseDetailPage() {
             Patient: <strong>{ccase.patient_name}</strong> — MRN: {ccase.patient_mrn}
           </p>
         </div>
-        <span style={{
-          padding: "4px 14px",
-          background: statusColor[ccase.status] ?? "#b2bec3",
-          color: "white",
-          borderRadius: "20px",
-          fontSize: "12px",
-          fontWeight: 500,
-          textTransform: "capitalize",
-        }}>
-          {ccase.status.replace("_", " ")}
-        </span>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Link
+            href={`/cases/${id}/edit`}
+            style={{ padding: "7px 16px", background: "#f1f2f6", color: "#2d3436", borderRadius: "8px", textDecoration: "none", fontSize: "13px", fontWeight: 500 }}
+          >
+            Edit
+          </Link>
+          <span style={{
+            padding: "4px 14px",
+            background: statusColor[ccase.status] ?? "#b2bec3",
+            color: "white",
+            borderRadius: "20px",
+            fontSize: "12px",
+            fontWeight: 500,
+            textTransform: "capitalize",
+          }}>
+            {ccase.status.replace("_", " ")}
+          </span>
+        </div>
       </div>
 
       <div style={{ background: "white", borderRadius: "12px", padding: "24px", marginBottom: "20px" }}>
