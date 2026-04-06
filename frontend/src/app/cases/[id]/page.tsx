@@ -151,6 +151,7 @@ export default function CaseDetailPage() {
                 <th style={th}>Start Date</th>
                 <th style={th}>End Date</th>
                 <th style={th}>Status</th>
+                <th style={th}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -171,6 +172,14 @@ export default function CaseDetailPage() {
                     }}>
                       {t.status_display}
                     </span>
+                  </td>
+                  <td style={td}>
+                    <Link
+                      href={`/treatments/${t.id}/edit`}
+                      style={{ color: "#0984e3", textDecoration: "none", fontSize: "13px", fontWeight: 500 }}
+                    >
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -208,6 +217,7 @@ export default function CaseDetailPage() {
                 <th style={th}>Contact Method</th>
                 <th style={th}>Next Follow-up</th>
                 <th style={th}>Physician</th>
+                <th style={th}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -229,6 +239,14 @@ export default function CaseDetailPage() {
                   <td style={td}>{f.contact_method_display}</td>
                   <td style={td}>{f.next_followup_date || "—"}</td>
                   <td style={td}>{f.attending_physician || "—"}</td>
+                  <td style={td}>
+                    <Link
+                      href={`/followups/${f.id}/edit`}
+                      style={{ color: "#0984e3", textDecoration: "none", fontSize: "13px", fontWeight: 500 }}
+                    >
+                      Edit
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
